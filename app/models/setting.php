@@ -1,0 +1,4 @@
+<?
+class Setting extends AppModel
+{
+}

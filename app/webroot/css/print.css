@@ -1,0 +1,7 @@
+body{background:#fff;}
+#header,#footer,.message-success,.message-notice{display:none;}
+#wrapper,#content{border:0px;}
+table *{white-space:nowrap;padding:5px 3px;margin:0;border-spacing:0;background:#fff;color:#000;border:0;}
+.print th,.print tbody tr td{border-bottom:1px solid #000;}
+#ticket-page{}
+#ticket-page table{}
