@@ -108,9 +108,9 @@ table input.serial{width:75%;}
 #home #messages .my-message .time{font-size:75%;float:right;}
 
 /* Tickets */
-.ticket-working td{background:#f99;}
+.refunded td,.ticket-working td{background:#fcc;}
 .ticket-finished td{background:#ff9;}
-.ticket-payed td{background:#9f9;}
+.ticket-payed td{background:#cfc;}
 
 .lavaLamp{position:relative;height:29px;width:421px;background:url("../image/bg.gif") no-repeat top;padding:15px;margin:10px 0;overflow:hidden;}
 .lavaLamp li{float:left;list-style:none;}

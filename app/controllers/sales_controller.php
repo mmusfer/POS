@@ -25,26 +25,12 @@ class SalesController extends AppController
 			'contain' => array('SoldItem' => array('Item'), 'Employee', 'Customer')))
 		);
 	}
-	public function refund($id = null)
-	{
-		if ($this->Session->read('Sale.type') != 'Refund')
-		{
-			$this->clear(false);
-			$this->Session->write('Sale.type', 'Refund');
-		}
-		$this->check($id, 'Sale');
-		$this->Sale->id = $id;
-		$sale = $this->Sale->find('first', array('conditions' => array('Sale.id' => $id), 'contain' => array(
-			'Employee' => array('fields' => 'Employee.name'), 'Customer' => array('fields' => 'Customer.name'),'SoldItem' => array('Item')
-		)));
-		$this->set('sale', $sale);
-	}
 	public function add()
 	{
-		if ($this->Session->read('Sale.type') != 'Sale')
+		if ($this->Session->read('Sale.type') != 0)
 		{
 			$this->clear(false);
-			$this->Session->write('Sale.type', 'Sale');
+			$this->Session->write('Sale.type', 0);
 		}
 		$this->loadModel('Customer');
 		$this->set('customers', $this->Customer->find('list'));
@@ -90,13 +76,11 @@ class SalesController extends AppController
 		$sold_items = $this->Session->read('SoldItem');
 		$total = 0;
 		if ($this->check_items())
-		{
 			foreach ($sold_items as $key => $sold_item)
+			{
 				$this->edit_item($key);
-			$sold_items = $this->Session->read('SoldItem');
-			foreach ($sold_items as $key => $sold_item)
-				$total += (float) $sold_item['net_price'];
-		}
+				$total += (float) $this->Session->read('SoldItem.'.$key.'.net_price');
+			}
 		$this->Session->write('Sale.total', $total);
 		if (!empty($this->data['Sale']['payment']))
 			$this->Session->write('Sale.payment', $this->data['Sale']['payment']);
@@ -201,6 +185,71 @@ class SalesController extends AppController
 		$this->Session->delete('SoldItem.'.$id);
 		$this->update_sale();
 		$this->redirect(array('action' => 'add'));
+	}
+	public function refund($id = null)
+	{
+		$this->check($id, 'Sale');
+		$this->Sale->id = $id;
+		$sale = $this->Sale->find('first', array('conditions' => array('Sale.id' => $id), 'contain' => array(
+			'Employee' => array('fields' => 'Employee.name'), 'Customer' => array('fields' => 'Customer.name'),'SoldItem' => array('Item')
+		)));
+		if (($this->Session->read('Sale.id') != $id) || ($this->Session->read('Sale.type') != 1))
+		{
+			$this->Session->delete('Sale');
+			$this->Session->write('Sale', $sale['Sale']);
+			$this->Session->write('SoldItem', $sale['SoldItem']);
+			$this->Session->write('Sale.type', 1);
+			$this->Session->write('Sale.new_total', $sale['Sale']['total']);
+			$this->Session->write('Sale.new_balance', $sale['Sale']['balance']);
+		}
+		else
+			$this->Session->write('Sale.new_balance', ($this->Session->read('Sale.new_total')-$this->Session->read('Sale.total')));
+		$this->set('sale', $sale);
+	}
+	public function refund_item($sale_id = null, $id = null)
+	{
+		if (($this->Session->read('Sale.id') == $sale_id) || ($this->Session->read('Sale.type') == 1))
+		{
+			$new_total = 0;
+			foreach($this->Session->read('SoldItem') as $key => $sold_item)
+			{
+				if ($id == $sold_item['id'])
+					if ($sold_item['quantity'] > 0)
+					{
+						$this->Session->write('SoldItem.'.$key.'.quantity', ($sold_item['quantity']-1));
+						$this->Session->write('SoldItem.'.$key.'.refunded', (!empty($sold_item['refunded'])) ? $sold_item['refunded']+1 : 1);
+						$dpu = ($sold_item['discount'] / $sold_item['quantity']);
+						$this->Session->write('SoldItem.'.$key.'.discount', ($dpu*($sold_item['quantity']-1)));
+						$net_price = ($sold_item['Item']['sell_price'] - $dpu) * ($sold_item['quantity'] - 1);
+						$this->Session->write('SoldItem.'.$key.'.net_price', $net_price);
+					}
+				$new_total += $this->Session->read('SoldItem.'.$key.'.net_price');
+			}
+			$this->Session->write('Sale.new_total', $new_total);
+		}
+		$this->redirect(array('action' => 'refund', $sale_id));
+	}
+	public function refund_finish($sale_id = null)
+	{
+		$this->check($id, 'Sale');
+		if (($this->Session->read('Sale.id') == $sale_id) || ($this->Session->read('Sale.type') == 1))
+		{
+			$new_total = 0;
+			foreach($this->Session->read('SoldItem') as $key => $sold_item)
+			{
+				if ($id == $sold_item['id'])
+					if ($sold_item['quantity'] > 0)
+					{
+						$this->Session->write('SoldItem.'.$key.'.quantity', ($sold_item['quantity']-1));
+						$this->Session->write('SoldItem.'.$key.'.refunded', (!empty($sold_item['refunded'])) ? $sold_item['refunded']+1 : 1);
+						$net_price = ($sold_item['Item']['sell_price'] - ($sold_item['discount'] / $sold_item['quantity'])) * ($sold_item['quantity'] - 1);
+						$this->Session->write('SoldItem.'.$key.'.net_price', $net_price);
+					}
+				$new_total += $this->Session->read('SoldItem.'.$key.'.net_price');
+			}
+			$this->Session->write('Sale.new_total', $new_total);
+		}
+		$this->redirect(array('action' => 'refund', $sale_id));
 	}
 	public function clear($redirect = true)
 	{
