@@ -5,11 +5,11 @@
 	); ?>
 	<? if (Employee::$auth['rank'] >= 5): ?>
 		<?= $html->link(
-			'<div>'.$html->image('icons/sales.png').'</div>', array('controller' => 'sales', 'action' => 'add'),
+			'<div>'.$html->image('icons/sales.png').'</div>', array('controller' => 'sales', 'action' => 'index'),
 			array('escape' => false, 'id' => ($this->params['controller'] == 'sales') ? 'current' : null)
 		); ?>
 		<?= $html->link(
-			'<div>'.$html->image('icons/tickets.png').'</div>', array('controller' => 'tickets', 'action' => 'add'),
+			'<div>'.$html->image('icons/tickets.png').'</div>', array('controller' => 'tickets', 'action' => 'index'),
 			array('escape' => false, 'id' => ($this->params['controller'] == 'tickets') ? 'current' : null)
 		); ?>
 		<?= $html->link(
