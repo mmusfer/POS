@@ -12,18 +12,8 @@ class ItemsController extends AppController
 	}
 	public function index()
 	{
-		$conditions = array('Item.deleted' => '0');
-		if (isset($this->params['named']['name'])) $conditions['Item.name LIKE'] = '%'.$this->params['named']['name'].'%';
-		if (isset($this->params['named']['barcode'])) $conditions['Item.barcode LIKE'] = '%'.$this->params['named']['barcode'].'%';
-		if (isset($this->params['named']['desc'])) $conditions['Item.desc LIKE'] = '%'.$this->params['named']['desc'].'%';
-		if (isset($this->params['named']['serialized'])) $conditions['Item.serialized'] = $this->params['named']['serialized'];
-		if (isset($this->params['named']['supplier_id'])) $conditions['Item.supplier_id'] = $this->params['named']['supplier_id'];
-		if (isset($this->params['named']['category'])) $conditions['Category.name'] = $this->params['named']['category'];
-		if (isset($this->params['named']['stock'])) $conditions['Item.stock >='] = $this->params['named']['stock'];
-		if (isset($this->params['named']['cost_price'])) $conditions['Item.cost_price >='] = $this->params['named']['cost_price'];
-		if (isset($this->params['named']['sell_price'])) $conditions['Item.sell_price >='] = $this->params['named']['sell_price'];
-		if (isset($this->params['named']['stock'])) $conditions['Item.stock >='] = $this->params['named']['stock'];
-		if (isset($this->params['named']['reorder_level'])) $conditions['Item.reorder_level >='] = $this->params['named']['reorder_level'];
+//		if ($this->RequestHandler->isPost())
+//	Find search query method
 		$this->paginate['Item'] = array(
 			'contain' => array('Category','Supplier'),
 			'limit' => 10,

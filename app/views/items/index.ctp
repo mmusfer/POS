@@ -1,3 +1,11 @@
+<div id="search">
+	<?= $form->create('Item', array('url' => array('action' => 'index'))); ?>
+	<?= $form->input('Item.name'); ?>
+	<?= $form->input('Item.barcode'); ?>
+	<?= $form->input('Item.sell_price'); ?>
+	<?= $form->input('Item.cost_price'); ?>
+	<?= $form->end('Search'); ?>
+</div>
 <table>
 	<tr>
 		<th><?= $paginator->sort('Id', 'cat_id'); ?></th>

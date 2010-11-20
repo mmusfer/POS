@@ -34,15 +34,25 @@
 	<div id="footer">
 		<?= Configure::read('Settings.name'); ?>
 	</div>
-	<script type="text/javascript">
-	$(function() {
-		$('.button, input:submit').button();
-		$("input[type=text]:first").focus();
-		$('.form-error').parent().css({'background-color': '#fcc'});
-		$(".combobox").combobox();
-		$('#time').jclock({format: '%a, %b %d, %Y | %I:%M:%S %P', fontSize: 13});
-	});
-	</script>
 </div>
-</body>
+<script type="text/javascript">
+$(function() {
+	$('.button, input:submit').button();
+	$("input[type=text]:first").focus();
+	$('.form-error').parent().css({'background-color': '#fcc'});
+	$(".combobox").combobox();
+	$('#time').jclock({format: '%a, %b %d, %Y | %I:%M:%S %P', fontSize: 13});
+	$("div#search label + input").each(function (type) {
+		$(this).focus(function () {
+			$(this).prev("label").addClass("focus");
+		});
+		$(this).keypress(function () {
+			$(this).prev("label").addClass("has-text").removeClass("focus");
+		});
+		$(this).blur(function () {
+			if($(this).val() == "") { $(this).prev("label").removeClass("has-text").removeClass("focus"); }
+		});
+	});
+});
+</script></body>
 </html>

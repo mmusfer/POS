@@ -18,7 +18,7 @@ p{margin:0;padding:0;}
 table{border-collapse:separate;border-spacing:0;margin:5px 0;width:100%;border:none;}
 td,th{vertical-align:middle;text-align:center;}
 th{background:#c6c6c6;text-align:center;border-left:1px solid #fff;border-bottom:1px solid #fff;font-weight:700;color:#666;padding:3px}
-td{background:#ededed;border:1px solid #fff;color:#669;padding:5px;}
+td{background:#ededed;border:1px solid #fff;color:#669;padding:2px;}
 tfoot td{font-weight:600;font-style:italic;}
 
 /* General Styels */
@@ -37,8 +37,8 @@ div.message,.error-message{padding:5px;border:2px solid #c00;background:#f99;mar
 .notice-message{padding:5px;border:2px solid #00f;background:#f0f0ff;margin:5px auto;width:75%;clear:both;color:#000;}
 
 /* Forms */
-form{padding:5px;}
-label{display:inline-block;text-align:right;padding-left:5px;}
+form{padding:5px 0;}
+label{padding-right:5px;}
 input[type=text],input[type=password],textarea,select{text-align:center;margin:5px;padding:5px 0;width:200px;font-size:100%;background-color:#e9e9e9;border:1px solid #ccc;-moz-border-radius:5px;}
 table input[type=text],table input[type=password],table textarea,table select{margin:1px;width:95%;font-size:75%;}
 input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{border-color:#ccc;background:#fff;}
@@ -112,8 +112,11 @@ table input.serial{width:75%;}
 .ticket-finished td{background:#ff9;}
 .ticket-payed td{background:#cfc;}
 
-.lavaLamp{position:relative;height:29px;width:421px;background:url("../image/bg.gif") no-repeat top;padding:15px;margin:10px 0;overflow:hidden;}
-.lavaLamp li{float:left;list-style:none;}
-.lavaLamp li.back {background:url("../image/lava.gif") no-repeat right -30px;width:9px;height:30px;z-index:8;position:absolute;}
-.lavaLamp li.back .left{background:url("../image/lava.gif") no-repeat top left;height:30px;margin-right:9px;}
-.lavaLamp li a{position:relative;overflow:hidden;text-decoration:none;text-transform:uppercase;font:bold 14px;color:#fff;outline:none;text-align:center;height:30px;top:7px;z-index:10;letter-spacing:0;float:left;display:block;margin:auto 10px;}
+/* Search */
+div#search{background:#ddd;border:1px solid #bbb;-moz-border-radius:10px;width:75%;margin:0 auto 10px;text-align:center;}
+div#search .input{margin:0 10px;width:270px;display:inline-block;text-align:left;}
+div#search .input label{z-index:2;top:5px;left:15px;position:relative;}
+div#search .input label.focus{opacity:0.5;}
+div#search .input label.has-text{opacity:0.1;}
+div#search .input input{width:250px;z-index:1;position:relative;margin-top:-20px;}
+
