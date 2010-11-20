@@ -27,11 +27,25 @@ class SalesController extends AppController
 	}
 	public function refund($id = null)
 	{
-		$this->update_sale();
-		$this->render('form');
+		if ($this->Session->read('Sale.type') != 'Refund')
+		{
+			$this->clear(false);
+			$this->Session->write('Sale.type', 'Refund');
+		}
+		$this->check($id, 'Sale');
+		$this->Sale->id = $id;
+		$sale = $this->Sale->find('first', array('conditions' => array('Sale.id' => $id), 'contain' => array(
+			'Employee' => array('fields' => 'Employee.name'), 'Customer' => array('fields' => 'Customer.name'),'SoldItem' => array('Item')
+		)));
+		$this->set('sale', $sale);
 	}
 	public function add()
 	{
+		if ($this->Session->read('Sale.type') != 'Sale')
+		{
+			$this->clear(false);
+			$this->Session->write('Sale.type', 'Sale');
+		}
 		$this->loadModel('Customer');
 		$this->set('customers', $this->Customer->find('list'));
 		$this->update_sale();
@@ -192,7 +206,7 @@ class SalesController extends AppController
 	{
 		$this->Session->delete('Sale');
 		$this->Session->delete('SoldItem');
-		$sale = array('total' => 0.00, 'payment' => 0.00, 'balance' => 0.00);
+		$sale = array('total' => 0, 'payment' => 0, 'balance' => 0, 'type' => 'Sale');
 		$this->Session->write('Sale', $sale);
 		if ($redirect)
 			$this->redirect(array('action' => 'add'));

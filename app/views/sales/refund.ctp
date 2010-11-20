@@ -1,63 +1,82 @@
-<?= $html->link($html->image('icons/actions/print.png').' Print', 'javascript:print();', array('class'=>'button', 'escape' => false)); ?><br /><br />
-<div id="page">
-	<div class="center">
-		<h1><?= Configure::read('Settings.name'); ?></h1>
-		<h4><?= Configure::read('Settings.address'); ?></h4>
-		<h5>Sale Receipt #<?= $sale['Sale']['id']; ?></h5>
-	</div>
-	<table>
-		<tr>
-			<td width='33%'>
-				Employee: <?= $sale['Employee']['name']; ?>
-				<? if (!empty($sale['Customer']['id']) && ($sale['Customer']['id'] != 0)): ?>
-					<br />Customer: <?= $sale['Customer']['name']; ?>
-				<? endif; ?>
-			</td>
-			<td width='33%'>
-				Date: <?= strftime('%a, %b %e %Y', strtotime($sale['Sale']['created'])); ?>
-				<br />Time: <?= strftime('%I:%M %p', strtotime($sale['Sale']['created'])); ?>
-			</td>
-			<td width='34%'>
-				<?= $html->image($barcode->output('S'.$sale['Sale']['id'])); ?>
-			</td>
-		</tr>
-	</table>
-	<table class="print">
-		<tr>
-			<th>#</th>
-			<th>Name</th>
-			<th>Quantity</th>
-			<th>Discount</th>
-			<th>Total</th>
-		</tr>
-		<? foreach($sale['SoldItem'] as $item): ?>
-		<tr>
-			<td width="10%"><?= $item['Item']['cat_id']; ?></td>
-			<td width="30%">
-				<?= $item['Item']['name']; ?>
-				<? if ($item['Item']['serialized']): ?>
-					<br />(S/N: <?= $item['serial']; ?>)
-				<? endif; ?>
-			</td>
-			<td width="20%"><?= $item['quantity']; ?></td>
-			<td width="20%"><?= $number->currency($item['discount']); ?></td>
-			<td width="20%"><?= $number->currency($item['net_price']); ?></td>
-		</tr>
-		<? endforeach; ?>
-	</table>
-	<table style="width:50%;" align="right">
-		<tr>
-			<th>Total</th>
-			<td><?= $number->currency($sale['Sale']['total']); ?></td>
-		</tr>
-		<tr>
-			<th>Payment</th>
-			<td><?= $number->currency($sale['Sale']['payment']); ?></td>
-		</tr>
-		<tr>
-			<th>Balance</th>
-			<td><?= $number->currency($sale['Sale']['balance']); ?></td>
-		</tr>
-	</table>
-	<?= Configure::read('Settings.sell_message'); ?>
-</div>
+<?// pr($session->read('Sale')); ?>
+<?// pr($session->read('SoldItem')); ?>
+<?= $form->create('Sale', array('inputDefaults' => array('label' => false, 'div' => false))); ?>
+<h5>Sale #<?= $sale['Sale']['id']; ?></h5>
+<table>
+	<tr>
+		<th width="30%">Customer:</th>
+		<td><?= $session->read('Customer.name'); ?></td>
+	</tr>
+	<tr>
+		<th width="30%">Employee:</th>
+		<td><?= $session->read('Employee.name'); ?></td>
+	</tr>
+</table>
+<table>
+	<tr>
+		<th>Name</th>
+		<th>Quantity</th>
+		<th>Discount</th>
+		<th>Total</th>
+		<th>Refund</th>
+	</tr>
+	<? foreach($sale['SoldItem'] as $item): ?>
+	<tr>
+		<td width="30%">
+			<?= $item['Item']['name']; ?>
+			<? if ($item['Item']['serialized']): ?>
+				<br />(S/N: <?= $item['serial']; ?>)
+			<? endif; ?>
+		</td>
+		<td width="20%"><?= $item['quantity']; ?></td>
+		<td width="20%"><?= $number->currency($item['discount']); ?></td>
+		<td width="20%"><?= $number->currency($item['net_price']); ?></td>
+		<td width="10%">
+			<?= $html->link(
+				$html->image('icons/actions/refund.png'), array('action' => 'refund_item', $item['id']),
+				array('escape' => false, 'class' => 'refund button')
+			); ?>
+		</td>
+	</tr>
+	<? endforeach; ?>
+</table>
+<table style="width:50%;" align="right">
+	<tr>
+		<th>Old Total</th>
+		<td><?= $number->currency($sale['Sale']['total']); ?></td>
+	</tr>
+	<tr>
+		<th>New Total</th>
+		<td><?= $number->currency($sale['Sale']['total']-$sale['Sale']['payment']); ?></td>
+	</tr>
+	<tr>
+		<th>Current Balance</th>
+		<td><?= $number->currency($sale['Sale']['balance']); ?></td>
+	</tr>
+</table>
+<div style="display:none;"><?= $form->end(''); ?></div>
+<?= $html->link(
+	$html->image('icons/actions/accept.png', array('alt' => 'Refund', 'title' => 'Refund')).' Confirm Refund',
+	array('action' => 'refund'),
+	array('escape' => false, 'class' => 'finish button')
+); ?>
+<br /><br />
+<?= $html->link(
+	$html->image('icons/actions/delete.png', array('alt' => 'Delete', 'title' => 'Delete')).' Cancel Sale',
+	array('action' => 'clear'),
+	array('escape' => false, 'class' => 'clear button')
+); ?>
+<script type="text/javascript">
+$(function() {
+	$('form').submit(function (e) {
+		e.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: $(this).attr('action'),
+			data: $(this).serialize(),
+			beforeSend: function () { $("#content").css({opacity: 0.2}, 500); $('#spinner').show(); },
+			success: function (data) { $("#content").html(data); $("#content").css({opacity: 1}, 500); $('#spinner').hide(); }
+		});
+	});
+});
+</script>
