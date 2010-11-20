@@ -1040,3 +1040,6 @@
 2010-11-20 03:38:54 Notice: Notice (8): Undefined index: serialized in [/Users/ibrahim/Sites/pos/app/views/sales/refund.ctp, line 29]
 2010-11-20 05:03:48 Notice: Notice (8): Undefined index: refunded in [/Users/ibrahim/Sites/pos/app/controllers/sales_controller.php, line 52]
 2010-11-20 05:04:50 Notice: Notice (8): Undefined index: refunded in [/Users/ibrahim/Sites/pos/app/controllers/sales_controller.php, line 52]
+2010-11-20 06:30:36 Notice: Notice (8): Undefined variable: id in [/Users/ibrahim/Sites/pos/app/controllers/sales_controller.php, line 234]
+2010-11-20 06:30:55 Notice: Notice (8): Undefined index: refunded in [/Users/ibrahim/Sites/pos/app/controllers/sales_controller.php, line 240]
+2010-11-20 07:08:27 Notice: Notice (8): Undefined index: change in [/Users/ibrahim/Sites/pos/app/models/sold_item.php, line 36]

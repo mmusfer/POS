@@ -33,6 +33,12 @@ class SoldItem extends AppModel
 		$reason = 'Sale #'.$item['Sale']['id'];
 		if ($item['Item']['serialized'] == 1)
 			$reason = 'Sale #'.$item['Sale']['id'].' (S/N: '.$item['SoldItem']['serial'].')';
-		$this->Item->stock_change($item['Item']['id'], -$item['SoldItem']['quantity'], $reason);
+		if (($item['SoldItem']['refunded'] > 0) && ($item['SoldItem']['last_change'] > 0))
+		{
+			$reason = 'Refund of '.$reason;
+			$this->Item->stock_change($item['Item']['id'], $item['SoldItem']['last_change'], $reason);
+		}
+		else
+			$this->Item->stock_change($item['Item']['id'], -$item['SoldItem']['quantity'], $reason);
 	}
 }

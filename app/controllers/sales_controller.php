@@ -211,7 +211,7 @@ class SalesController extends AppController
 		if (($this->Session->read('Sale.id') == $sale_id) || ($this->Session->read('Sale.type') == 1))
 		{
 			$new_total = 0;
-			foreach($this->Session->read('SoldItem') as $key => $sold_item)
+			foreach ($this->Session->read('SoldItem') as $key => $sold_item)
 			{
 				if ($id == $sold_item['id'])
 					if ($sold_item['quantity'] > 0)
@@ -231,23 +231,33 @@ class SalesController extends AppController
 	}
 	public function refund_finish($sale_id = null)
 	{
-		$this->check($id, 'Sale');
+		$this->check($sale_id, 'Sale');
 		if (($this->Session->read('Sale.id') == $sale_id) || ($this->Session->read('Sale.type') == 1))
 		{
-			$new_total = 0;
-			foreach($this->Session->read('SoldItem') as $key => $sold_item)
-			{
-				if ($id == $sold_item['id'])
-					if ($sold_item['quantity'] > 0)
+			$this->loadModel('SoldItem');
+			foreach ($this->Session->read('SoldItem') as $key => $sold_item)
+			{	
+				$this->SoldItem->id = $sold_item['id'];
+				if ((!empty($sold_item['refunded'])) && ($sold_item['refunded'] >= 0))
+				{
+					$change = ($sold_item['refunded'] - $this->SoldItem->field('refunded'));
+					if ($change > 0)
 					{
-						$this->Session->write('SoldItem.'.$key.'.quantity', ($sold_item['quantity']-1));
-						$this->Session->write('SoldItem.'.$key.'.refunded', (!empty($sold_item['refunded'])) ? $sold_item['refunded']+1 : 1);
-						$net_price = ($sold_item['Item']['sell_price'] - ($sold_item['discount'] / $sold_item['quantity'])) * ($sold_item['quantity'] - 1);
-						$this->Session->write('SoldItem.'.$key.'.net_price', $net_price);
+						$data['SoldItem'] = $sold_item;
+						$data['SoldItem']['last_change'] = $change;
+						$this->SoldItem->save($data);
 					}
-				$new_total += $this->Session->read('SoldItem.'.$key.'.net_price');
+				}
 			}
-			$this->Session->write('Sale.new_total', $new_total);
+			$sale = $this->Session->read('Sale');
+			$sale['total'] = $sale['new_total'];
+			$sale['balance'] += $sale['new_balance'];
+			$this->Sale->id = $sale_id;
+			if ($this->Sale->save($sale))
+			{
+				$this->clear(false);
+				$this->redirect(array('action' => 'view', $sale_id));
+			}
 		}
 		$this->redirect(array('action' => 'refund', $sale_id));
 	}
